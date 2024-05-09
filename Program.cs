@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using NLog;
+﻿using NLog;
+using System.Linq;
 
 namespace BlogsAndPosts
 {
@@ -17,6 +17,9 @@ namespace BlogsAndPosts
             // Main functionality
             try {
                 while (true) {
+                    // Create instance of dbcontext
+                    var db = new TradersContext();
+
                     // Print options
                     Console.WriteLine("\nSelect Option:");
                     Console.WriteLine("  1. Add product");
@@ -40,39 +43,39 @@ namespace BlogsAndPosts
                     // Run code based on option acquired from user
                     switch(option) {
                         case '1':
-                            Case1();
+                            Case1(db, logger);
                             break;
                         case '2':
-                            Case2();
+                            Case2(db, logger);
                             break;
                         case '3':
-                            Case3();
+                            Case3(db, logger);
                             break;
                         case '4':
-                            Case4();
+                            Case4(db, logger);
                             break;
                         case '5':
-                            Case5();
+                            Case5(db, logger);
                             break;
                         case '6':
-                            Case6();
+                            Case6(db, logger);
                             break;
                         case '7':
-                            Case7();
+                            Case7(db, logger);
                             break;
                         case '8':
-                            Case8();
+                            Case8(db, logger);
                             break;
                         case '9':
-                            Case9();
+                            Case9(db, logger);
                             break;
                         case 'A':
                         case 'a':
-                            CaseA();
+                            CaseA(db, logger);
                             break;
                         case 'B':
                         case 'b':
-                            CaseB();
+                            CaseB(db, logger);
                             break;
                         default:
                             Environment.Exit(1);
@@ -88,49 +91,55 @@ namespace BlogsAndPosts
             logger.Info("Program ended");
         }
 
-        public static void Case1() {
+        public static void Case1(TradersContext db, Logger logger) {
             Console.WriteLine("Add records to Products table");
         }
 
-        public static void Case2() {
+        public static void Case2(TradersContext db, Logger logger) {
             Console.WriteLine("Edit records from Products table");
         }
 
-        public static void Case3() {
+        public static void Case3(TradersContext db, Logger logger) {
             Console.WriteLine("Display all records in the Products table (ProductName only)");
             Console.WriteLine("User decides if they want to see all products, discontinued products, or active products");
             Console.WriteLine("Discontinued products should be distinguished from active products");
         }
 
-        public static void Case4() {
+        public static void Case4(TradersContext db, Logger logger) {
             Console.WriteLine("Display a specific Product (all product fields should be displayed)");
         }
 
-        public static void Case5() {
+        public static void Case5(TradersContext db, Logger logger) {
             Console.WriteLine("Delete a specified existing record from the Products table (account for Orphans in related tables)");
         }
 
-        public static void Case6() {
-            Console.WriteLine("Add new records to the Categories table");
+        public static void Case6(TradersContext db, Logger logger) {
+            // Add new category
+            var categoryName = GetString("\nEnter a name for a new Category: ", "Category name cannot be blank.");
+            var description = GetString("Enter the category description: ", "Category description cannot be blank.");
+            var category = new Category { CategoryName = categoryName, Description = description };
+
+            db.AddCategory(category);
+            logger.Info("Category added - {name}", categoryName);
         }
 
-        public static void Case7() {
+        public static void Case7(TradersContext db, Logger logger) {
             Console.WriteLine("Edit a specified record from the Categories table");
         }
 
-        public static void Case8() {
+        public static void Case8(TradersContext db, Logger logger) {
             Console.WriteLine("Display all Categories in the Categories table (CategoryName and Description)");
         }
 
-        public static void Case9() {
+        public static void Case9(TradersContext db, Logger logger) {
             Console.WriteLine("Display all Categories and their related active (not discontinued) product data (CategoryName, ProductName)");
         }
 
-        public static void CaseA() {
+        public static void CaseA(TradersContext db, Logger logger) {
             Console.WriteLine("Display a specific Category and its related active product data (CategoryName, ProductName)");
         }
 
-        public static void CaseB() {
+        public static void CaseB(TradersContext db, Logger logger) {
             Console.WriteLine("Delete a specified existing record from the Categories table (account for Orphans in related tables)");
         }
 
