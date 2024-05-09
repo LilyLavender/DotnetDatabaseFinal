@@ -92,7 +92,27 @@ namespace BlogsAndPosts
         }
 
         public static void Case1(TradersContext db, Logger logger) {
-            Console.WriteLine("Add records to Products table");
+            // Add new product
+            var productName = GetString("\nEnter a name for a new Product: ", "Product name cannot be blank.");
+            var quantityPerUnit = GetString("Enter the quantity per unit\n(eg. \"24 - 12 oz bottles\"): ", "Quantity per unit cannot be blank.");
+            var unitPrice = GetDouble(true, 0.0, Double.MaxValue, "Enter the unit price: ", "Unit price invalid.");
+            var reorderLevel = GetInt(false, 0, 0, "Enter reorder level: ", "Invalid reorder level.");
+            var discontinued = GetBool("Is the product discontinued?");
+            int categoryID = GetCategory(db, "Select the product\'s category");
+            var product = new Product { 
+                ProductName = productName,
+                SupplierID = 1,
+                CategoryID = categoryID,
+                QuantityPerUnit = quantityPerUnit,
+                UnitPrice = (decimal)unitPrice,
+                UnitsInStock = 0,
+                UnitsOnOrder = 0,
+                ReorderLevel = (short)reorderLevel,
+                Discontinued = discontinued
+            };
+
+            db.AddProduct(product);
+            logger.Info("Product added - {productName}", product);
         }
 
         public static void Case2(TradersContext db, Logger logger) {
@@ -150,11 +170,7 @@ namespace BlogsAndPosts
 
         public static void CaseA(TradersContext db, Logger logger) {
             // Display specific category & active products
-            Console.WriteLine("Select the category to view");
-            DisplayAllCategories(db);
-            int minCatId = db.Categories.Min(b => b.CategoryID);
-            int maxCatId = db.Categories.Max(b => b.CategoryID);
-            int userSelection = GetInt(true, minCatId, maxCatId, "", "Invalid category ID");
+            int userSelection = GetCategory(db, "Select the category to view");
 
             var category = db.Categories.Where(c => c.CategoryID == userSelection).ToList()[0];
             Console.WriteLine($"{category.CategoryName}");
@@ -177,6 +193,14 @@ namespace BlogsAndPosts
             foreach (var cat in categories) {
                 Console.WriteLine($"{cat.CategoryID}. {cat.CategoryName} - {cat.Description}");
             }
+        }
+
+        public static int GetCategory(TradersContext db, string prompt) {
+            Console.WriteLine(prompt);
+            DisplayAllCategories(db);
+            int minCatId = db.Categories.Min(b => b.CategoryID);
+            int maxCatId = db.Categories.Max(b => b.CategoryID);
+            return GetInt(true, minCatId, maxCatId, "", "Invalid category ID");
         }
 
         /// <summary>
@@ -294,6 +318,65 @@ namespace BlogsAndPosts
 
             return userChar;
 
+        }
+
+        /// <summary>
+        /// Gets a double from the user
+        /// </summary>
+        /// <param name="restrictValues">Whether or not to restrict the value between doubleMin and doubleMax</param>
+        /// <param name="doubleMin">The minimum value to accept</param>
+        /// <param name="doubleMax">The maximum value to accept</param>
+        /// <param name="prompt">Message that asks the user for a double</param>
+        /// <param name="errorMsg">What to output in the case of an invalid double</param>
+        /// <returns></returns>
+        public static double GetDouble(bool restrictValues, double doubleMin, double doubleMax, string prompt, string errorMsg) 
+        {
+
+            string userString = "";
+            double userDouble = 0;
+            bool repSuccess = false;
+            do
+            {
+                Console.Write(prompt);
+                userString = Console.ReadLine();
+
+                if (Double.TryParse(userString, out userDouble))
+                {
+                    if (restrictValues) {
+                        if (userDouble >= doubleMin && userDouble <= doubleMax)
+                        {
+                            repSuccess = true;
+                        }
+                    } else {
+                        repSuccess = true;
+                    }
+                    
+                }
+
+                // Output error
+                if (!repSuccess)
+                {
+                    Console.WriteLine(errorMsg);
+                }
+            } while (!repSuccess);
+
+            return userDouble;
+
+        }
+
+        /// <summary>
+        /// Gets a bool from the user
+        /// </summary>
+        /// <param name="prompt">Message that asks the user for a y/n value</param>
+        /// <param name="errorMsg">What to output in the case of an invalid answer</param>
+        /// <returns></returns>
+        public static bool GetBool(string prompt) {
+            char userChar = GetChar(true, new char[] { 'y', 'Y', 'n', 'N' }, prompt + " (Y/N): ", "Invalid input.");
+            if (userChar == 'y' || userChar == 'Y') {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 

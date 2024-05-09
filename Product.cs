@@ -10,6 +10,4 @@ public class Product
     public Int16 UnitsOnOrder { get; set; }
     public Int16 ReorderLevel { get; set; }
     public bool Discontinued { get; set; }
-
-    public Category category { get; set; }
 }
