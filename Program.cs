@@ -128,11 +128,27 @@ namespace BlogsAndPosts
         }
 
         public static void Case8(TradersContext db, Logger logger) {
-            Console.WriteLine("Display all Categories in the Categories table (CategoryName and Description)");
+            // Display all categories
+            var categories = db.Categories.ToList();
+            foreach (var cat in categories) {
+                Console.WriteLine($"{cat.CategoryID}. {cat.CategoryName} - {cat.Description}");
+            }
         }
 
         public static void Case9(TradersContext db, Logger logger) {
-            Console.WriteLine("Display all Categories and their related active (not discontinued) product data (CategoryName, ProductName)");
+            // Display all categories & related products
+            var categories = db.Categories.ToList();
+            foreach (var cat in categories) {
+                Console.WriteLine($"{cat.CategoryID}. {cat.CategoryName}");
+                var products = db.Products.Where(p => p.CategoryID == cat.CategoryID && p.Discontinued == false);
+                if (products.Count() == 0) {
+                    Console.WriteLine("       No products in category");
+                } else {
+                    foreach (var pro in products) {
+                        Console.WriteLine($"       {pro.ProductName}");
+                    }
+                }
+            }
         }
 
         public static void CaseA(TradersContext db, Logger logger) {
