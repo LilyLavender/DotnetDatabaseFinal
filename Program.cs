@@ -145,7 +145,7 @@ namespace BlogsAndPosts
         /// <returns>int</returns>
         public static int GetInt(bool restrictValues, int intMin, int intMax, string prompt, string errorMsg) {
 
-            string? userString = "";
+            string userString = "";
             int userInt = 0;
             bool repSuccess = false;
             do {
@@ -182,7 +182,7 @@ namespace BlogsAndPosts
         /// <param name="errorMsg">What to output in the case of an invalid string</param>
         /// <returns>string</returns>
         public static string GetString(string prompt, string errorMsg) {
-            string? userString = "";
+            string userString = "";
             bool repSuccess = false;
             do
             {
@@ -215,7 +215,7 @@ namespace BlogsAndPosts
         public static char GetChar(bool restrictValues, char[] possibleAnswers, string prompt, string errorMsg)
         {
 
-            string? userString = "";
+            string userString = "";
             char userChar = '0';
             bool repSuccess = false;
             do
