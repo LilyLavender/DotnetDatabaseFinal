@@ -129,10 +129,7 @@ namespace BlogsAndPosts
 
         public static void Case8(TradersContext db, Logger logger) {
             // Display all categories
-            var categories = db.Categories.ToList();
-            foreach (var cat in categories) {
-                Console.WriteLine($"{cat.CategoryID}. {cat.CategoryName} - {cat.Description}");
-            }
+            DisplayAllCategories(db);
         }
 
         public static void Case9(TradersContext db, Logger logger) {
@@ -142,7 +139,7 @@ namespace BlogsAndPosts
                 Console.WriteLine($"{cat.CategoryID}. {cat.CategoryName}");
                 var products = db.Products.Where(p => p.CategoryID == cat.CategoryID && p.Discontinued == false);
                 if (products.Count() == 0) {
-                    Console.WriteLine("       No products in category");
+                    Console.WriteLine("       No active products in category");
                 } else {
                     foreach (var pro in products) {
                         Console.WriteLine($"       {pro.ProductName}");
@@ -152,11 +149,34 @@ namespace BlogsAndPosts
         }
 
         public static void CaseA(TradersContext db, Logger logger) {
-            Console.WriteLine("Display a specific Category and its related active product data (CategoryName, ProductName)");
+            // Display specific category & active products
+            Console.WriteLine("Select the category to view");
+            DisplayAllCategories(db);
+            int minCatId = db.Categories.Min(b => b.CategoryID);
+            int maxCatId = db.Categories.Max(b => b.CategoryID);
+            int userSelection = GetInt(true, minCatId, maxCatId, "", "Invalid category ID");
+
+            var category = db.Categories.Where(c => c.CategoryID == userSelection).ToList()[0];
+            Console.WriteLine($"{category.CategoryName}");
+            var products = db.Products.Where(p => p.CategoryID == category.CategoryID && p.Discontinued == false);
+            if (products.Count() == 0) {
+                Console.WriteLine("    No active products in category");
+            } else {
+                foreach (var pro in products) {
+                    Console.WriteLine($"    {pro.ProductName}");
+                }
+            }
         }
 
         public static void CaseB(TradersContext db, Logger logger) {
             Console.WriteLine("Delete a specified existing record from the Categories table (account for Orphans in related tables)");
+        }
+
+        public static void DisplayAllCategories(TradersContext db) {
+            var categories = db.Categories.ToList();
+            foreach (var cat in categories) {
+                Console.WriteLine($"{cat.CategoryID}. {cat.CategoryName} - {cat.Description}");
+            }
         }
 
         /// <summary>
