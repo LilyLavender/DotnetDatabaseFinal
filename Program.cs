@@ -104,8 +104,7 @@ namespace BlogsAndPosts
                             CaseB(db, logger);
                             break;
                         default:
-                            Environment.Exit(1);
-                            break;
+                            goto End;
                     }
                 }
             }
@@ -114,6 +113,7 @@ namespace BlogsAndPosts
                 logger.Error(ex.Message);
             }
 
+            End: // ⎛⎝(•ⱅ•)⎠⎞ 
             logger.Info("Program ended");
         }
 
@@ -138,7 +138,7 @@ namespace BlogsAndPosts
             };
 
             db.AddProduct(product);
-            logger.Info("Product added - {productName}", product);
+            logger.Info("Product added - {name}", productName);
         }
 
         public static void Case2(TradersContext db, Logger logger) {
@@ -182,8 +182,9 @@ namespace BlogsAndPosts
 
         public static void Case5(TradersContext db, Logger logger) {
             // Delete product
-            Product product= db.Products.Where(p => p.ProductID == GetProduct(db, "Select the product to delete")).ToList()[0];
+            Product product = db.Products.Where(p => p.ProductID == GetProduct(db, "Select the product to delete")).ToList()[0];
             db.DeleteProduct(product);
+            logger.Info("Product deleted - {name}", product.ProductName);
         }
 
         public static void Case6(TradersContext db, Logger logger) {
@@ -240,7 +241,13 @@ namespace BlogsAndPosts
         public static void CaseB(TradersContext db, Logger logger) {
             // Delete category
             Category category = db.Categories.Where(c => c.CategoryID == GetCategory(db, "Select the category to delete")).ToList()[0];
+            List<Product> products = db.Products.Where(p => p.CategoryID == category.CategoryID).ToList();
+            foreach (var product in products) {
+                db.DeleteProduct(product);
+            }
             db.DeleteCategory(category);
+
+            logger.Info("Category and its products deleted - {name}", category.CategoryName);
         }
 
         public static void DisplayAllCategories(TradersContext db) {
