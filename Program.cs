@@ -49,7 +49,32 @@ namespace BlogsAndPosts
                             Case2(db, logger);
                             break;
                         case '3':
-                            Case3(db, logger);
+                            while (true) {
+                                // Print options
+                                Console.WriteLine("\nSelect Option:");
+                                Console.WriteLine("  1. View all products");
+                                Console.WriteLine("  2. View active products");
+                                Console.WriteLine("  3. View discontinued products");
+                                Console.WriteLine("  0. Exit");
+
+                                // Get option from user
+                                int option2 = GetInt(true, 0, 3, "", "Invalid Option");
+                                // Run code based on option acquired from user
+                                switch(option2) {
+                                    case 1:
+                                        Case3(db, logger, true, true);
+                                        break;
+                                    case 2:
+                                        Case3(db, logger, true, false);
+                                        break;
+                                    case 3:
+                                        Case3(db, logger, false, true);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                break;
+                            }
                             break;
                         case '4':
                             Case4(db, logger);
@@ -119,10 +144,22 @@ namespace BlogsAndPosts
             Console.WriteLine("Edit records from Products table");
         }
 
-        public static void Case3(TradersContext db, Logger logger) {
-            Console.WriteLine("Display all records in the Products table (ProductName only)");
-            Console.WriteLine("User decides if they want to see all products, discontinued products, or active products");
-            Console.WriteLine("Discontinued products should be distinguished from active products");
+        public static void Case3(TradersContext db, Logger logger, bool showActiveProducts, bool showDiscontinuedProducts) {
+            // Display all products
+            if (showActiveProducts) {
+                var activeProducts = db.Products.Where(p => p.Discontinued == false).ToList();
+                Console.WriteLine("\nActive Products:");
+                foreach (var ap in activeProducts) {
+                    Console.WriteLine($"{ap.ProductID}. {ap.ProductName}");
+                }
+            }
+            if (showDiscontinuedProducts) {
+                var discontinuedProducts = db.Products.Where(p => p.Discontinued == true).ToList();
+                Console.WriteLine("\nDiscontinued Products:");
+                foreach (var dp in discontinuedProducts) {
+                    Console.WriteLine($"{dp.ProductID}. {dp.ProductName}");
+                }
+            }
         }
 
         public static void Case4(TradersContext db, Logger logger) {
