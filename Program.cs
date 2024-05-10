@@ -1,4 +1,5 @@
 ﻿using NLog;
+using System.Globalization;
 using System.Linq;
 
 namespace BlogsAndPosts
@@ -163,7 +164,20 @@ namespace BlogsAndPosts
         }
 
         public static void Case4(TradersContext db, Logger logger) {
-            Console.WriteLine("Display a specific Product (all product fields should be displayed)");
+            // Display a specific product
+            int userSelection = GetProduct(db, "Select the product to view");
+
+            var product = db.Products.Where(p => p.ProductID == userSelection).ToList()[0];
+            var catName = db.Categories.Where(c => c.CategoryID == product.CategoryID).ToList()[0].CategoryName;
+            Console.WriteLine($"ProductID: {product.ProductID}");
+            Console.WriteLine($"ProductName: {product.ProductName}");
+            Console.WriteLine($"CategoryID: {product.CategoryID} ({catName})");
+            Console.WriteLine($"QuantityPerUnit: {product.QuantityPerUnit}");
+            Console.WriteLine($"UnitPrice: {product.UnitPrice.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))}");
+            Console.WriteLine($"UnitsInStock: {product.UnitsInStock}");
+            Console.WriteLine($"UnitsOnOrder: {product.UnitsOnOrder}");
+            Console.WriteLine($"ReorderLevel: {product.ReorderLevel}");
+            Console.WriteLine($"Discontinued: {product.Discontinued}");
         }
 
         public static void Case5(TradersContext db, Logger logger) {
@@ -237,7 +251,30 @@ namespace BlogsAndPosts
             DisplayAllCategories(db);
             int minCatId = db.Categories.Min(b => b.CategoryID);
             int maxCatId = db.Categories.Max(b => b.CategoryID);
-            return GetInt(true, minCatId, maxCatId, "", "Invalid category ID");
+            int userInt;
+            do {
+                userInt = GetInt(true, minCatId, maxCatId, "", "Invalid category ID");
+            } while (!db.Categories.Any(c => c.CategoryID == userInt));
+            return userInt;
+        }
+
+        public static void DisplayAllProducts(TradersContext db) {
+            var products = db.Products.ToList();
+            foreach (var p in products) {
+                Console.WriteLine($"{p.ProductID}. {p.ProductName}");
+            }
+        }
+
+        public static int GetProduct(TradersContext db, string prompt) {
+            Console.WriteLine(prompt);
+            DisplayAllProducts(db);
+            int minProductId = db.Products.Min(b => b.ProductID);
+            int maxProductId = db.Products.Max(b => b.ProductID);
+            int userInt;
+            do {
+                userInt = GetInt(true, minProductId, maxProductId, "", "Invalid product ID");
+            } while (!db.Products.Any(p => p.ProductID == userInt));
+            return userInt;
         }
 
         /// <summary>
