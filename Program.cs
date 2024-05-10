@@ -181,7 +181,9 @@ namespace BlogsAndPosts
         }
 
         public static void Case5(TradersContext db, Logger logger) {
-            Console.WriteLine("Delete a specified existing record from the Products table (account for Orphans in related tables)");
+            // Delete product
+            Product product= db.Products.Where(p => p.ProductID == GetProduct(db, "Select the product to delete")).ToList()[0];
+            db.DeleteProduct(product);
         }
 
         public static void Case6(TradersContext db, Logger logger) {
@@ -236,7 +238,9 @@ namespace BlogsAndPosts
         }
 
         public static void CaseB(TradersContext db, Logger logger) {
-            Console.WriteLine("Delete a specified existing record from the Categories table (account for Orphans in related tables)");
+            // Delete category
+            Category category = db.Categories.Where(c => c.CategoryID == GetCategory(db, "Select the category to delete")).ToList()[0];
+            db.DeleteCategory(category);
         }
 
         public static void DisplayAllCategories(TradersContext db) {
