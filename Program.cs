@@ -119,30 +119,20 @@ namespace BlogsAndPosts
 
         public static void Case1(TradersContext db, Logger logger) {
             // Add new product
-            var productName = GetString("\nEnter a name for a new Product: ", "Product name cannot be blank.");
-            var quantityPerUnit = GetString("Enter the quantity per unit\n(eg. \"24 - 12 oz bottles\"): ", "Quantity per unit cannot be blank.");
-            var unitPrice = GetDouble(true, 0.0, Double.MaxValue, "Enter the unit price: ", "Unit price invalid.");
-            var reorderLevel = GetInt(false, 0, 0, "Enter reorder level: ", "Invalid reorder level.");
-            var discontinued = GetBool("Is the product discontinued?");
-            int categoryID = GetCategory(db, "Select the product\'s category");
-            var product = new Product { 
-                ProductName = productName,
-                SupplierID = 1,
-                CategoryID = categoryID,
-                QuantityPerUnit = quantityPerUnit,
-                UnitPrice = (decimal)unitPrice,
-                UnitsInStock = 0,
-                UnitsOnOrder = 0,
-                ReorderLevel = (short)reorderLevel,
-                Discontinued = discontinued
-            };
+            Product newProduct = CreateProduct(db);
 
-            db.AddProduct(product);
-            logger.Info("Product added - {name}", productName);
+            db.AddProduct(newProduct);
+            logger.Info("Product added - {name}", newProduct.ProductName);
         }
 
         public static void Case2(TradersContext db, Logger logger) {
-            Console.WriteLine("Edit records from Products table");
+            // Edit product
+            int userSelection = GetProduct(db, "Select the product to edit");
+            Product newProduct = CreateProduct(db);
+            newProduct.ProductID = userSelection;
+
+            db.EditProduct(newProduct);
+            logger.Info("Product edited - {name}", newProduct.ProductName);
         }
 
         public static void Case3(TradersContext db, Logger logger, bool showActiveProducts, bool showDiscontinuedProducts) {
@@ -189,16 +179,20 @@ namespace BlogsAndPosts
 
         public static void Case6(TradersContext db, Logger logger) {
             // Add new category
-            var categoryName = GetString("\nEnter a name for a new Category: ", "Category name cannot be blank.");
-            var description = GetString("Enter the category description: ", "Category description cannot be blank.");
-            var category = new Category { CategoryName = categoryName, Description = description };
+            Category category = CreateCategory(db);
 
             db.AddCategory(category);
-            logger.Info("Category added - {name}", categoryName);
+            logger.Info("Category added - {name}", category.CategoryName);
         }
 
         public static void Case7(TradersContext db, Logger logger) {
-            Console.WriteLine("Edit a specified record from the Categories table");
+            // Edit category
+            int userSelection = GetCategory(db, "Select the category to edit");
+            Category newCategory = CreateCategory(db);
+            newCategory.CategoryID = userSelection;
+
+            db.EditCategory(newCategory);
+            logger.Info("Category edited - {name}", newCategory.CategoryName);
         }
 
         public static void Case8(TradersContext db, Logger logger) {
@@ -286,6 +280,32 @@ namespace BlogsAndPosts
                 userInt = GetInt(true, minProductId, maxProductId, "", "Invalid product ID");
             } while (!db.Products.Any(p => p.ProductID == userInt));
             return userInt;
+        }
+
+        public static Product CreateProduct(TradersContext db) {
+            var productName = GetString("\nEnter product name: ", "Product name cannot be blank.");
+            var quantityPerUnit = GetString("Enter the quantity per unit\n(eg. \"24 - 12 oz bottles\"): ", "Quantity per unit cannot be blank.");
+            var unitPrice = GetDouble(true, 0.0, Double.MaxValue, "Enter the unit price: ", "Unit price invalid.");
+            var reorderLevel = GetInt(false, 0, 0, "Enter reorder level: ", "Invalid reorder level.");
+            var discontinued = GetBool("Is the product discontinued?");
+            int categoryID = GetCategory(db, "Select the product\'s category");
+            return new Product { 
+                ProductName = productName,
+                SupplierID = 1,
+                CategoryID = categoryID,
+                QuantityPerUnit = quantityPerUnit,
+                UnitPrice = (decimal)unitPrice,
+                UnitsInStock = 0,
+                UnitsOnOrder = 0,
+                ReorderLevel = (short)reorderLevel,
+                Discontinued = discontinued
+            };
+        }
+
+        public static Category CreateCategory(TradersContext db) {
+            var categoryName = GetString("\nEnter category name: ", "Category name cannot be blank.");
+            var description = GetString("Enter category description: ", "Category description cannot be blank.");
+            return new Category { CategoryName = categoryName, Description = description };
         }
 
         /// <summary>
